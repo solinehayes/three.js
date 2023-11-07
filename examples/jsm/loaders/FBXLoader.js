@@ -91,7 +91,6 @@ class FBXLoader extends Loader {
 				onLoad( scope.parse( buffer, path ) );
 
 			} catch ( e ) {
-
 				if ( onError ) {
 
 					onError( e );
@@ -2702,7 +2701,6 @@ class AnimationParser {
 		let values;
 
 		if ( curves.x !== undefined && curves.y !== undefined && curves.z !== undefined ) {
-
 			const result = this.interpolateRotations( curves.x, curves.y, curves.z, eulerOrder );
 
 			times = result[ 0 ];
@@ -2734,7 +2732,6 @@ class AnimationParser {
 		const euler = new Euler();
 
 		const quaternionValues = [];
-
 		if ( ! values || ! times ) return new QuaternionKeyframeTrack( modelName + '.quaternion', [], [] );
 
 		for ( let i = 0; i < values.length; i += 3 ) {
@@ -2895,6 +2892,13 @@ class AnimationParser {
 
 		const times = [];
 		const values = [];
+
+		// Push first value
+		times.push( curvex.times[ 0 ] );
+		values.push( MathUtils.degToRad( curvex.values[ 0  ] ) );
+		values.push( MathUtils.degToRad( curvey.values[ 0  ] ) );
+		values.push( MathUtils.degToRad( curvez.values[ 0  ] ) );
+
 		for ( let i = 1; i < curvex.values.length; i ++ ) {
 
 			const initialValue = [
