@@ -8119,7 +8119,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 			this.frustumCulled = source.frustumCulled;
 			this.renderOrder = source.renderOrder;
 
-			this.animations = source.animations.slice();
+			this.animations = source.animations?.slice() || [];
 
 			this.userData = JSON.parse( JSON.stringify( source.userData ) );
 
