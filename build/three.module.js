@@ -7879,6 +7879,26 @@ class Object3D extends EventDispatcher {
 
 		}
 
+		if ( this.isBatchedMesh ) {
+
+			object.type = 'BatchedMesh';
+			object.drawRanges = this._drawRanges;
+			object.reservedRanges = this._reservedRanges;
+
+			object.visible = this._visible;
+			object.active = this._active;
+
+			object.maxGeometryCount = this._maxGeometryCount;
+			object.maxVertexCount = this._maxVertexCount;
+			object.maxIndexCount = this._maxIndexCount;
+
+			object.geometryInitialized = this._geometryInitialized;
+			object.geometryCount = this._geometryCount;
+
+			object.matricesTexture = this._matricesTexture.toJSON();
+
+		}
+
 		//
 
 		function serialize( library, element ) {
@@ -8092,7 +8112,7 @@ class Object3D extends EventDispatcher {
 		this.frustumCulled = source.frustumCulled;
 		this.renderOrder = source.renderOrder;
 
-		this.animations = source.animations.slice();
+		this.animations = source.animations?.slice() || [];
 
 		this.userData = JSON.parse( JSON.stringify( source.userData ) );
 
