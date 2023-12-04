@@ -14018,7 +14018,7 @@ var shadowmask_pars_fragment = "float getShadowMask() {\n\tfloat shadow = 1.0;\n
 
 var skinbase_vertex = "#ifdef USE_SKINNING\n\tmat4 boneMatX = getBoneMatrix( skinIndex.x );\n\tmat4 boneMatY = getBoneMatrix( skinIndex.y );\n\tmat4 boneMatZ = getBoneMatrix( skinIndex.z );\n\tmat4 boneMatW = getBoneMatrix( skinIndex.w );\n#endif";
 
-var skinning_pars_vertex = "#ifdef USE_SKINNING\n\tuniform mat4 bindMatrix;\n\tuniform mat4 bindMatrixInverse;\n\tuniform highp sampler2D boneTexture;\n\tmat4 getBoneMatrix( const in float i ) {\n\t\tint size = textureSize( boneTexture, 0 ).x;\n\t\tint j = int( i ) * 4;\n\t\tint x = j % size;\n\t\tint y = j / size;\n\t\tvec4 v1 = texelFetch( boneTexture, ivec2( x, y ), 0 );\n\t\tvec4 v2 = texelFetch( boneTexture, ivec2( x + 1, y ), 0 );\n\t\tvec4 v3 = texelFetch( boneTexture, ivec2( x + 2, y ), 0 );\n\t\tvec4 v4 = texelFetch( boneTexture, ivec2( x + 3, y ), 0 );\n\t\treturn mat4( v1, v2, v3, v4 );\n\t}\n#endif";
+var skinning_pars_vertex = "#ifdef USE_SKINNING\n\tuniform mat4 bindMatrix;\n\tuniform mat4 bindMatrixInverse;\n\tuniform highp sampler2D boneTexture;\n\tmat4 getBoneMatrix( const in float i ) {\n\t\tint size = textureSize( boneTexture, 0 ).x;\n\t\tint j = int( i ) * 4;\n\t\tint x = j % size;\n\t\tint y = j / size;\n\t\tvec4 v1 = texelFetch( boneTexture, ivec2( x, y ), 0 );\n\t\tvec4 v2 = texelFetch( boneTexture, ivec2( x + 1, y ), 0 );\n\t\tvec4 v3 = texelFetch( boneTexture, ivec2( x + 2, y ), 0 );\n\t\tvec4 v4 = texelFetch( boneTexture, ivec2( x + 3, y ), 0 );\n\t\treturn mat4( v1, v2, v3, v4 );\n\t}\n#endif\n#ifdef USE_LEGACY_SKINNING\n\tuniform mat4 bindMatrix;\n\tuniform mat4 bindMatrixInverse;\n\tuniform highp sampler2D boneTexture;\n\tuniform int boneTextureSize;\n\tmat4 getBoneMatrix( const in float i ) {\n\t\tfloat j = i * 4.0;\n\t\tfloat x = mod( j, float( boneTextureSize ) );\n\t\tfloat y = floor( j / float( boneTextureSize ) );\n\t\tfloat dx = 1.0 / float( boneTextureSize );\n\t\tfloat dy = 1.0 / float( boneTextureSize );\n\t\ty = dy * ( y + 0.5 );\n\t\tvec4 v1 = texture2D( boneTexture, vec2( dx * ( x + 0.5 ), y ) );\n\t\tvec4 v2 = texture2D( boneTexture, vec2( dx * ( x + 1.5 ), y ) );\n\t\tvec4 v3 = texture2D( boneTexture, vec2( dx * ( x + 2.5 ), y ) );\n\t\tvec4 v4 = texture2D( boneTexture, vec2( dx * ( x + 3.5 ), y ) );\n\t\tmat4 bone = mat4( v1, v2, v3, v4 );\n\t\treturn bone;\n\t}\n#endif";
 
 var skinning_vertex = "#ifdef USE_SKINNING\n\tvec4 skinVertex = bindMatrix * vec4( transformed, 1.0 );\n\tvec4 skinned = vec4( 0.0 );\n\tskinned += boneMatX * skinVertex * skinWeight.x;\n\tskinned += boneMatY * skinVertex * skinWeight.y;\n\tskinned += boneMatZ * skinVertex * skinWeight.z;\n\tskinned += boneMatW * skinVertex * skinWeight.w;\n\ttransformed = ( bindMatrixInverse * skinned ).xyz;\n#endif";
 
@@ -19848,6 +19848,7 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 		}
 
 	} else {
+		console.log("🚀 ~ file: WebGLProgram.js:599 ~ WebGLProgram ~ (parameters.skinning && !parameters.isWebGL2):", (parameters.skinning && !parameters.isWebGL2));
 
 		prefixVertex = [
 
@@ -19949,7 +19950,8 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 
 			parameters.flatShading ? '#define FLAT_SHADED' : '',
 
-			parameters.skinning ? '#define USE_SKINNING' : '',
+			(parameters.skinning && parameters.isWebGL2) ? '#define USE_SKINNING' : '',
+			(parameters.skinning && !parameters.isWebGL2) ? '#define USE_LEGACY_SKINNING' : '',
 
 			parameters.morphTargets ? '#define USE_MORPHTARGETS' : '',
 			parameters.morphNormals && parameters.flatShading === false ? '#define USE_MORPHNORMALS' : '',
@@ -30347,6 +30349,7 @@ class WebGLRenderer {
 						if ( skeleton.boneTexture === null ) skeleton.computeBoneTexture();
 
 						p_uniforms.setValue( _gl, 'boneTexture', skeleton.boneTexture, textures );
+						p_uniforms.setValue( _gl, 'boneTextureSize', skeleton.boneTextureSize );
 
 					} else {
 
@@ -32326,6 +32329,7 @@ class Skeleton {
 		this.boneMatrices = null;
 
 		this.boneTexture = null;
+		this.boneTextureSize = 0;
 
 		this.init();
 
@@ -32484,6 +32488,7 @@ class Skeleton {
 
 		this.boneMatrices = boneMatrices;
 		this.boneTexture = boneTexture;
+		this.boneTextureSize = size;
 
 		return this;
 
