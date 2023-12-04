@@ -21,6 +21,7 @@ class Skeleton {
 		this.boneMatrices = null;
 
 		this.boneTexture = null;
+		this.boneTextureSize = 0;
 
 		this.init();
 
@@ -179,6 +180,7 @@ class Skeleton {
 
 		this.boneMatrices = boneMatrices;
 		this.boneTexture = boneTexture;
+		this.boneTextureSize = size;
 
 		return this;
 
