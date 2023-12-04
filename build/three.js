@@ -19853,7 +19853,6 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 			}
 
 		} else {
-			console.log("🚀 ~ file: WebGLProgram.js:599 ~ WebGLProgram ~ (parameters.skinning && !parameters.isWebGL2):", (parameters.skinning && !parameters.isWebGL2));
 
 			prefixVertex = [
 

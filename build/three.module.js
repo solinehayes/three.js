@@ -19846,7 +19846,6 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 		}
 
 	} else {
-		console.log("🚀 ~ file: WebGLProgram.js:599 ~ WebGLProgram ~ (parameters.skinning && !parameters.isWebGL2):", (parameters.skinning && !parameters.isWebGL2));
 
 		prefixVertex = [
 
