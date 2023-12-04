@@ -594,8 +594,8 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 
 			parameters.flatShading ? '#define FLAT_SHADED' : '',
 
-			(parameters.skinning && parameters.isWebGL2) ? '#define USE_SKINNING' : '',
-			(parameters.skinning && !parameters.isWebGL2) ? '#define USE_LEGACY_SKINNING' : '',
+			parameters.skinning ? '#define USE_SKINNING' : '',
+			( parameters.skinning && ! parameters.isWebGL2 ) ? '#define USE_LEGACY_SKINNING' : '',
 
 			parameters.morphTargets ? '#define USE_MORPHTARGETS' : '',
 			parameters.morphNormals && parameters.flatShading === false ? '#define USE_MORPHNORMALS' : '',
